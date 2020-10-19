@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #include "calculator.h"
 
-static enum CALC_STATES { CALC_SMStart, CALC_INIT, CALC_OPERAND1, CALC_OPERATOR, CALC_OPERAND2, CALC_EQUALS, CALC_ERROR, CALC_RESULT, CALC_DIVZERO} CALC_STATE;
+static enum CALC_STATES { CALC_SMStart, CALC_INIT, CALC_OPERAND1, CALC_OPERATOR, CALC_OPERAND2, CALC_EQUALS, CALC_ERROR, CALC_RESULT, CALC_DIVZERO} CALC_STATE, NEXT_STATE;
 
 
 int64_t tickFct_CALCULATOR(uint8_t button) {
@@ -10,73 +10,74 @@ int64_t tickFct_CALCULATOR(uint8_t button) {
 
    switch(CALC_STATE) {
       case CALC_SMStart:
-         CALC_STATE = CALC_INIT;
+         NEXT_STATE = CALC_INIT;
          break;
 
       case CALC_INIT:
-         CALC_STATE = CALC_OPERAND1;
+         NEXT_STATE = CALC_OPERAND1;
          break;
 
       case CALC_OPERAND1:
          if(button == 14) // If C is pressed.
-            CALC_STATE = CALC_INIT;
+            NEXT_STATE = CALC_INIT;
          else if(button >= 10 && button <= 13) // If an operator has been pressed.
-            CALC_STATE = CALC_OPERAND2;
+            NEXT_STATE = CALC_OPERAND2;
          else if( (currentNum > 0x10000000 && currentNum * 10 + button < 0x10000000)) // If adding this number will  cause overflow
-            CALC_STATE = CALC_ERROR;
+            NEXT_STATE = CALC_ERROR;
          else
-            CALC_STATE = CALC_OPERAND1;
+            NEXT_STATE = CALC_OPERAND1;
          break;
 
       case CALC_OPERATOR:
             if(newOperator == 13 && currentNum == 0)
-              CALC_STATE = CALC_DIVZERO;
+              NEXT_STATE = CALC_DIVZERO;
             else
-              CALC_STATE = CALC_OPERAND2;
+              NEXT_STATE = CALC_OPERAND2;
          break;
 
       case CALC_OPERAND2:
         if(button == 14) // If C is pressed.
-           CALC_STATE = CALC_INIT;
+           NEXT_STATE = CALC_INIT;
         else if(button >= 10 && button <= 13) // If an operator has been pressed.
-           CALC_STATE = CALC_OPERATOR;
+           NEXT_STATE = CALC_OPERATOR;
         else if( (currentNum > 0x10000000 && currentNum * 10 + button < 0x10000000)) // If adding this number will  cause overflow
-           CALC_STATE = CALC_ERROR;
+           NEXT_STATE = CALC_ERROR;
         else if(button == 15) // If = is pressed.
-           CALC_STATE = CALC_EQUALS;
+           NEXT_STATE = CALC_EQUALS;
         else
-           CALC_STATE = CALC_OPERAND2;
+           NEXT_STATE = CALC_OPERAND2;
         break;
 
       case CALC_EQUALS:
           if(newOperator == 13 && currentNum == 0)
-            CALC_STATE = CALC_DIVZERO;
+            NEXT_STATE = CALC_DIVZERO;
           else
-            CALC_STATE = CALC_RESULT;
+            NEXT_STATE = CALC_RESULT;
          break;
 
       case CALC_RESULT:
         if(button == 14) // If C is pressed.
-          CALC_STATE = CALC_INIT;
+          NEXT_STATE = CALC_INIT;
         else
-          CALC_STATE = CALC_RESULT;
+          NEXT_STATE = CALC_RESULT;
       break;
 
       case CALC_ERROR:
         if(button == 14) // If C is pressed.
-          CALC_STATE = CALC_INIT;
+          NEXT_STATE = CALC_INIT;
         else
-          CALC_STATE = CALC_ERROR;
+          NEXT_STATE = CALC_ERROR;
         break;
 
       case CALC_DIVZERO:
         if(button == 14) // If C is pressed.
-          CALC_STATE = CALC_INIT;
+          NEXT_STATE = CALC_INIT;
         else
-          CALC_STATE = CALC_DIVZERO;
+          NEXT_STATE = CALC_DIVZERO;
         break;
 
       default:
+          NEXT_STATE = CALC_INIT;
          break;
    }
 
@@ -95,8 +96,11 @@ int64_t tickFct_CALCULATOR(uint8_t button) {
           if( !(currentNum > 0x10000000 && currentNum * 10 + button < 0x10000000)) // If adding this number will not cause overflow, add it.
             currentNum = currentNum * 10 + button;
 
-        if(button >= 10 && button <= 13) // If an operator has been pressed.
-            newOperator = button;
+        if(button >= 10 && button <= 13){ // If an operator has been pressed.
+            operator = button;
+            memory = currentNum;
+            currentNum = 0;
+        }
 
          break;
       case CALC_OPERATOR:
@@ -119,17 +123,19 @@ int64_t tickFct_CALCULATOR(uint8_t button) {
 
         break;
       case CALC_OPERAND2:
-      if(button < 10) // If a number has been pressed.
-        if( !(currentNum > 0x10000000 && currentNum * 10 + button < 0x10000000)) // If adding this number will not cause overflow, add it.
-          currentNum = currentNum * 10 + button;
+        if(button < 10){ // If a number has been pressed.
+          if( !(currentNum > 0x10000000 && currentNum * 10 + button < 0x10000000)) // If adding this number will not cause overflow, add it.
+            currentNum = currentNum * 10 + button;
+        }
 
-      if(button >= 10 && button <= 13) // If an operator has been pressed.
-      {
-          newOperator = button;
+        if(button >= 10 && button <= 13) // If an operator has been pressed.
+        {
+            newOperator = button;
 
-      }
+        }
 
-         break;
+        break;
+         
       case CALC_EQUALS:
 
         if(operator == 10) // +
@@ -144,16 +150,17 @@ int64_t tickFct_CALCULATOR(uint8_t button) {
          break;
 
       case CALC_ERROR:
-        currentNum = -1;
+        currentNum = -1001;
          break;
 
        case CALC_DIVZERO:
-         currentNum = -2;
+         currentNum = -1002;
           break;
 
       default:
          break;
    }
-
+   
+   CALC_STATE = NEXT_STATE;
    return currentNum;
 }

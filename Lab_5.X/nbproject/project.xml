@@ -3,7 +3,7 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>Lab_5</name>
+            <name>lab_5</name>
             <creation-uuid>13933db8-0239-4cae-9667-af8c303cc2c8</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
@@ -13,6 +13,7 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
+                <sourceRootElem>Adafruit_2_4_LCD_Serial_Library</sourceRootElem>
                 <sourceRootElem>../test_lcd_orig.X/Adafruit_2_4_LCD_Serial_Library</sourceRootElem>
                 <sourceRootElem>.</sourceRootElem>
             </sourceRootList>

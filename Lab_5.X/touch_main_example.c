@@ -34,7 +34,8 @@ int main(int argc, char** argv) {
 
     draw_buttons();
 
-    int8_t input = button_detect();
+    int8_t input = button_detect(), x = 16;
+    
     int64_t calcResult;
 
     while(1){
@@ -46,8 +47,10 @@ int main(int argc, char** argv) {
         action = 1;
 
         if(input >= 0) // If there was a valid input.
-          calcResult = tickFct_CALCULATOR(input);
+            x = input;
       }
+      calcResult = tickFct_CALCULATOR(x);
+      x = 16;
 
       if(!screenIsPressed())
         action = 0;
@@ -62,11 +65,11 @@ int main(int argc, char** argv) {
       tft_setTextSize(2);
       tft_setCursor(37, 20);
       tft_setTextColor(ILI9341_BLACK);
-      if(calcResult >= 0)
+      if(calcResult >= -1000)
         sprintf(buffer, "%d", calcResult);
-      else if(calcResult == -1)
+      else if(calcResult == -1001)
         sprintf(buffer,"ERROR");
-      else if(calcResult == -2)
+      else if(calcResult == -1002)
         sprintf(buffer,"DIV0");
 
       tft_writeString(buffer);

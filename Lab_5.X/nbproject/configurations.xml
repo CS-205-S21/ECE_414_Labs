@@ -37,6 +37,7 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
+    <Elem>Adafruit_2_4_LCD_Serial_Library</Elem>
     <Elem>../test_lcd_orig.X/Adafruit_2_4_LCD_Serial_Library</Elem>
     <Elem>.</Elem>
   </sourceRootList>
@@ -50,14 +51,12 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PKOBSKDEPlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>2.41</languageToolchainVersion>
+        <languageToolchainVersion>2.40</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
-        <pack name="PIC32MX_DFP" vendor="Microchip" version="1.0.28"/>
+        <pack name="PIC32MX_DFP" vendor="Microchip" version="1.2.228"/>
       </packs>
-      <ScriptingSettings>
-      </ScriptingSettings>
       <compileType>
         <linkerTool>
           <linkerLibItems>
@@ -223,7 +222,6 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="memories.configurationmemory" value="true"/>
         <property key="memories.dataflash" value="true"/>
         <property key="memories.eeprom" value="true"/>
